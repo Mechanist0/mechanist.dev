@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 export const useControls = () => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 })
   const keys = {
     KeyW: "forward",
     KeyS: "backward",
@@ -30,15 +31,27 @@ export const useControls = () => {
         ...m,
         [moveByKey(e.code)]: false,
       }));
+    const handleWindowMouseMove = event => {
+      setCoords({
+        x: event.clientX,
+        y: event.clientY,
+      });
+    };
+    document.addEventListener('mousemove', handleWindowMouseMove);
 
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
 
     return () => {
+      console.log(coords.x, coords.y);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener(
+        'mousemove',
+        handleWindowMouseMove,
+      );
     };
   }, [moveByKey, moveByButton]);
 
-  return interaction;
+  return [interaction, coords];
 };

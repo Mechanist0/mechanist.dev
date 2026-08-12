@@ -9,7 +9,7 @@ const Character = (props: CANNON.BoxProps) => {
   const direction = useMemo(() => new THREE.Vector3(), []);
   const frontVect = useMemo(() => new THREE.Vector3(), []);
   const sideVect = useMemo(() => new THREE.Vector3(), []);
-  const worldVect = useMemo(() => new THREE.Vector3(), []);
+  const mouseVect = useMemo(() => new THREE.Vector2(), []);
   const SPEED = 10;
   const ACCEL = 1;
   const { camera } = useThree();
@@ -22,7 +22,7 @@ const Character = (props: CANNON.BoxProps) => {
   }));
 
   const setPosition = createCharacter((state) => state.setPosition);
-  const { forward, backward, left, right } = useControls();
+  const { forward, backward, left, right } = useControls()[0];
   const vel = useRef<any>([0, 0, 0]);
   useEffect(
     () => api.velocity.subscribe((v) => (vel.current = v)),
@@ -51,6 +51,20 @@ const Character = (props: CANNON.BoxProps) => {
 
   const raycast = useMemo(() => new THREE.Raycaster(), []);
 
+  // Sets normalized mouse coordinates
+  window.addEventListener("mousemove", (e) => {
+    mouseVect.setX((e.clientX / window.innerWidth) * 2 - 1);
+    mouseVect.setY(-(e.clientY / window.innerWidth) * 2 + 1);
+    raycast.setFromCamera(mouseVect, camera);
+    console.log(mouseVect);
+  });
+
+  useEffect(() => {
+    mouseVect.setY(-(e.clientY / window.innerWidth) * 2 + 1);
+    raycast.setFromCamera(mouseVect, camera);
+    console.log(mouseVect);
+  }, [raycast])
+
   useFrame(() => {
     frontVect.set(0, 0, Number(backward) - Number(forward));
     sideVect.set(Number(left) - Number(right), 0, 0);
@@ -71,6 +85,7 @@ const Character = (props: CANNON.BoxProps) => {
       charPosition.current[1],
       charPosition.current[2],
     );
+
   });
   return (
     <group>

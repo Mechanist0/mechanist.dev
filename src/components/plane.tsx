@@ -16,7 +16,7 @@ const Plane = (props: PlaneProps) => {
 
   return (
     <mesh
-      castShadow={true}
+      receiveShadow
       position={props.position}
       rotation={props.rotation}
       ref={ref}
